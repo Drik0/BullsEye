@@ -24,11 +24,41 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         startNewRound()
+        let thumbImage = #imageLiteral(resourceName: "SliderThumb-Normal")
+        slider.setThumbImage(thumbImage, for: .normal)
+        slider.setThumbImage(#imageLiteral(resourceName: "SliderThumb-Highlighted"), for: .highlighted)
+        
+        let insets = UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
+        
+        let trackLeftImage = #imageLiteral(resourceName: "SliderTrackLeft")
+        let trackLeftResizeable = trackLeftImage.resizableImage(withCapInsets: insets)
+        
+        let trackRightImage = #imageLiteral(resourceName: "SliderTrackRight")
+        let trackRightResizeable = trackRightImage.resizableImage(withCapInsets: insets)
+        
+        slider.setMinimumTrackImage(trackLeftResizeable, for: .normal)
+        slider.setMaximumTrackImage(trackRightResizeable, for: .normal)
     }
-
-
+    
+    func startNewRound() {
+        currentValue = 50
+        targetValue = Int.random(in: 1...100)
+        slider.value = Float(currentValue)
+        
+        round += 1
+        
+        updateLabels()
+    }
+    
+    func updateLabels() {
+        targetValueLabel.text = "\(targetValue)"
+        scoreLabel.text = "\(score)"
+        roundLabel.text = "\(round)"
+    }
+    
     @IBAction func showAlert(_ sender: UIButton) {
         let difference: Int = abs(targetValue - currentValue)
+        
         var points: Int {
             var points = 100 - difference
             
@@ -59,30 +89,19 @@ class ViewController: UIViewController {
         }
         
         let alert = UIAlertController(title: title, message: "You've scored \(points) points", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            self.startNewRound()
+        }))
         present(alert, animated: true, completion: nil)
-        
-        startNewRound()
     }
     
     @IBAction func sliderChanged(_ sender: UISlider) {
         currentValue = Int(sender.value.rounded())
     }
-    
-    func startNewRound() {
-        currentValue = 50
-        targetValue = Int.random(in: 1...100)
-        slider.value = Float(currentValue)
-        
-        round += 1
-        
-        updateLabels()
-    }
-    
-    func updateLabels() {
-        targetValueLabel.text = "\(targetValue)"
-        scoreLabel.text = "\(score)"
-        roundLabel.text = "\(round)"
+    @IBAction func restartBtnPressed(_ sender: UIButton) {
+        round = 0
+        score = 0
+        startNewRound()
     }
 }
 
